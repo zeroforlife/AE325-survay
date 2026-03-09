@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AE325 Exam Schedule Survey</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #071c2d;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            color: #f0f8ff;
+            cursor: auto;
+        }
+
+        #bgVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            object-fit: cover;
+            transform: translate(-50%, -50%);
+            z-index: -1;
+            filter: brightness(0.55) contrast(1.1);
+        }
+
+        .content-overlay {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .form-container {
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(16px);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            max-width: 500px;
+            width: 100%;
+            transition: transform 0.25s ease, opacity 0.25s ease;
+        }
+
+        /* Owner login should remain fully readable */
+        #ownerLogin,
+        #ownerArea {
+            background: rgba(255,255,255,0.92) !important;
+            backdrop-filter: none !important;
+        }
+
+        #ownerButton {
+            position: fixed;
+            bottom: 18px;
+            left: 18px;
+            z-index: 999;
+            padding: 8px 12px;
+            font-size: 13px;
+            background: rgba(0,0,0,0.30);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+
+        #ownerButton:hover {
+            background: rgba(0,0,0,0.45);
+        }
+
+        .hidden {
+            opacity: 0;
+            max-height: 0;
+            overflow: hidden;
+            transform: translateY(-10px);
+            transition: transform 0.25s ease, opacity 0.25s ease, max-height 0.25s ease;
+        }
+
+        .visible {
+            opacity: 1;
+            max-height: 1000px;
+            transform: translateY(0);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        p {
+            font-size: 0.95em;
+            line-height: 1.6;
+            color: #666;
+        }
+        .question-block {
+            margin: 25px 0;
+        }
+        .question-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .option {
+            display: block;
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option:hover {
+            background: #f0f7ff;
+            border-color: #3498db;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            resize: vertical;
+            min-height: 80px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+
+<video id="bgVideo" autoplay muted loop playsinline>
+    <source src="background.mp4" type="video/mp4">
+    <!-- Replace "background.mp4" with your video filename (same folder). -->
+</video>
+
+<div class="content-overlay">
+        <button id="ownerButton">Owner Login</button>
+        <div class="form-container" id="surveyContainer">
+            <h2>AE325 Exam Survey</h2>
+            <p>We are collecting student feedback regarding the proposal to move the <strong>Numerical Methods (AE325)</strong> exam to the third Thursday of the schedule.</p>
+
+            <form id="surveyForm">
+                <div id="stepName" class="question-block visible">
+                    <span class="question-label">Your name</span>
+                    <input type="text" id="nameInput" name="name" placeholder="Enter your name" required style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box;" />
+                    <button type="button" id="startButton" style="margin-top:15px;">Continue</button>
+                </div>
+
+                <div id="stepSurvey" class="hidden">
+                    <div class="question-block">
+                        <span class="question-label">Do you agree with postponing the exam?</span>
+                        
+                        <label class="option">
+                            <input type="radio" name="agreement" value="yes" required> Yes, I agree.
+                        </label>
+                        
+                        <label class="option">
+                            <input type="radio" name="agreement" value="no"> No, I do not agree.
+                        </label>
+                        
+                        <label class="option">
+                            <input type="radio" name="agreement" value="none"> No preference.
+                        </label>
+                    </div>
+
+                    <div class="question-block">
+                        <span class="question-label">Additional Comments (Optional)</span>
+                        <textarea id="commentsInput" name="comments" placeholder="Share any concerns or suggestions..."></textarea>
+                    </div>
+
+                    <button type="submit">Submit Response</button>
+                </div>
+            </form>
+
+            <div id="thankYou" style="display:none; margin-top:20px; padding:15px; border:1px solid #2ecc71; border-radius:5px; background:#e9f7ef; color:#2c662d;">
+                <strong>Thank you!</strong> Your response has been recorded.
+            </div>
+        </div>
+<div class="form-container" id="ownerLogin" style="display:none;">
+    <h2>Owner Login</h2>
+    <p>Enter the owner password to view responses and statistics.</p>
+    <div class="question-block">
+        <span class="question-label">Password</span>
+        <input type="password" id="ownerPassword" placeholder="Owner password" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing:border-box;" />
+    </div>
+    <button id="ownerSubmit">Enter Owner Area</button>
+    <button id="ownerBack" type="button" style="margin-top:10px; background: rgba(0,0,0,0.08); color:#333; border:1px solid rgba(0,0,0,0.15);">Back to Survey</button>
+    <div id="ownerError" style="display:none; margin-top:15px; color:#c0392b;"></div>
+</div>
+
+<div class="form-container" id="ownerArea" style="display:none;">
+    <h2>Owner Dashboard</h2>
+    <p>Only the owner can see full response details and percentage breakdowns.</p>
+
+    <div style="margin-bottom:20px;">
+        <strong>Total responses:</strong> <span id="totalResponses">0</span><br />
+        <strong>Agreed:</strong> <span id="percentYes">0%</span> (<span id="countYes">0</span>)<br />
+        <strong>Disagreed:</strong> <span id="percentNo">0%</span> (<span id="countNo">0</span>)<br />
+        <strong>No preference:</strong> <span id="percentNone">0%</span> (<span id="countNone">0</span>)
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <button id="printButton" style="width:auto; padding:10px 20px; margin-right:10px;">Print Table</button>
+        <button id="clearButton" style="width:auto; padding:10px 20px; background:#c0392b;">Clear All Responses</button>
+        <button id="logoutButton" style="width:auto; padding:10px 20px; background:#555;">Logout</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+        <table id="responsesTable" style="width:100%; border-collapse:collapse;">
+            <thead>
+                <tr>
+                    <th style="border:1px solid #ddd; padding:10px; background:#f0f0f0;">Name</th>
+                    <th style="border:1px solid #ddd; padding:10px; background:#f0f0f0;">Agreement</th>
+                    <th style="border:1px solid #ddd; padding:10px; background:#f0f0f0;">Comments</th>
+                    <th style="border:1px solid #ddd; padding:10px; background:#f0f0f0;">Submitted</th>
+                </tr>
+            </thead>
+            <tbody id="responsesBody"></tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<script>
+(function() {
+    const STORAGE_KEY = 'ae325_survey_responses_v1';
+    const OWNER_PASSWORD = 'examOwner2026';
+
+    const surveyForm = document.getElementById('surveyForm');
+    const thankYou = document.getElementById('thankYou');
+    const ownerButton = document.getElementById('ownerButton');
+    const ownerLogin = document.getElementById('ownerLogin');
+    const ownerArea = document.getElementById('ownerArea');
+    const ownerSubmit = document.getElementById('ownerSubmit');
+    const ownerBack = document.getElementById('ownerBack');
+    const ownerPassword = document.getElementById('ownerPassword');
+    const ownerError = document.getElementById('ownerError');
+    const responsesBody = document.getElementById('responsesBody');
+    const totalResponsesEl = document.getElementById('totalResponses');
+    const percentYes = document.getElementById('percentYes');
+    const percentNo = document.getElementById('percentNo');
+    const percentNone = document.getElementById('percentNone');
+    const countYes = document.getElementById('countYes');
+    const countNo = document.getElementById('countNo');
+    const countNone = document.getElementById('countNone');
+    const printButton = document.getElementById('printButton');
+    const clearButton = document.getElementById('clearButton');
+    const logoutButton = document.getElementById('logoutButton');
+    const surveyContainer = document.getElementById('surveyContainer');
+    const startButton = document.getElementById('startButton');
+    const stepSurvey = document.getElementById('stepSurvey');
+    const stepName = document.getElementById('stepName');
+
+    function getResponses() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch (e) {
+            console.warn('Failed to parse stored responses', e);
+            return [];
+        }
+    }
+
+    function saveResponses(responses) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
+    }
+
+    function formatDate(ts) {
+        const d = new Date(ts);
+        return d.toLocaleString();
+    }
+
+    function normalizeName(name) {
+        return name.trim().replace(/\s+/g, ' ');
+    }
+
+    function renderStats(responses) {
+        const total = responses.length;
+        const yes = responses.filter(r => r.agreement === 'yes').length;
+        const no = responses.filter(r => r.agreement === 'no').length;
+        const none = responses.filter(r => r.agreement === 'none').length;
+        const pct = (count) => total === 0 ? '0%' : Math.round((count / total) * 100) + '%';
+
+        totalResponsesEl.textContent = total;
+        countYes.textContent = yes;
+        countNo.textContent = no;
+        countNone.textContent = none;
+        percentYes.textContent = pct(yes);
+        percentNo.textContent = pct(no);
+        percentNone.textContent = pct(none);
+    }
+
+    function renderTable(responses) {
+        responsesBody.innerHTML = '';
+        responses.slice().reverse().forEach(resp => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="border:1px solid #ddd; padding:10px;">${escapeHtml(resp.name)}</td>
+                <td style="border:1px solid #ddd; padding:10px;">${escapeHtml(formatAgreement(resp.agreement))}</td>
+                <td style="border:1px solid #ddd; padding:10px;">${escapeHtml(resp.comments)}</td>
+                <td style="border:1px solid #ddd; padding:10px;">${escapeHtml(formatDate(resp.createdAt))}</td>
+            `;
+            responsesBody.appendChild(tr);
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function formatAgreement(value) {
+        if (value === 'yes') return 'Agree';
+        if (value === 'no') return 'Disagree';
+        return 'No preference';
+    }
+
+    function showOwnerArea() {
+        ownerLogin.style.display = 'none';
+        ownerError.style.display = 'none';
+        ownerArea.style.display = 'block';
+        surveyContainer.style.display = 'none';
+        const responses = getResponses();
+        renderStats(responses);
+        renderTable(responses);
+    }
+
+    function clearAllResponses() {
+        if (!confirm('This will permanently delete all stored responses. Proceed?')) return;
+        localStorage.removeItem(STORAGE_KEY);
+        renderStats([]);
+        renderTable([]);
+    }
+
+    startButton.addEventListener('click', () => {
+        const name = normalizeName(document.getElementById('nameInput').value);
+        if (!name) {
+            alert('Please enter your name before continuing.');
+            return;
+        }
+        stepName.classList.remove('visible');
+        stepName.classList.add('hidden');
+        stepSurvey.classList.remove('hidden');
+        stepSurvey.classList.add('visible');
+        // Focus first option so user can select quickly
+        const firstRadio = surveyForm.querySelector('input[name="agreement"]');
+        if (firstRadio) firstRadio.focus();
+    });
+
+    surveyForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const name = normalizeName(document.getElementById('nameInput').value);
+        const agreement = surveyForm.elements['agreement'].value;
+        const comments = document.getElementById('commentsInput').value.trim();
+
+        if (!name) {
+            alert('Please enter your name before submitting.');
+            return;
+        }
+
+        const responses = getResponses();
+        responses.push({
+            name,
+            agreement,
+            comments,
+            createdAt: Date.now()
+        });
+        saveResponses(responses);
+
+        surveyForm.reset();
+        thankYou.style.display = 'block';
+        setTimeout(() => { thankYou.style.display = 'none'; }, 8000);
+    });
+
+    ownerButton.addEventListener('click', () => {
+        surveyContainer.style.display = 'none';
+        ownerLogin.style.display = 'block';
+        ownerError.style.display = 'none';
+        ownerPassword.value = '';
+    });
+
+    ownerSubmit.addEventListener('click', () => {
+        ownerError.style.display = 'none';
+        if (ownerPassword.value === OWNER_PASSWORD) {
+            showOwnerArea();
+        } else {
+            ownerError.textContent = 'Incorrect password. Please try again.';
+            ownerError.style.display = 'block';
+        }
+    });
+
+    ownerBack.addEventListener('click', () => {
+        ownerLogin.style.display = 'none';
+        surveyContainer.style.display = 'block';
+    });
+
+    logoutButton.addEventListener('click', () => {
+        ownerArea.style.display = 'none';
+        surveyContainer.style.display = 'block';
+    });
+
+    clearButton.addEventListener('click', clearAllResponses);
+
+    printButton.addEventListener('click', () => {
+        window.print();
+    });
+})();
+</script>
+
+</body>
+</html>

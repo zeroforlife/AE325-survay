@@ -442,7 +442,18 @@ addDoc(collection(window.db,"responses"),{
     comments:comments,
     createdAt:new Date().toISOString()
 });
-        saveResponses(responses);
+async function clearAllResponses() {
+    if (!confirm('This will delete all responses. Proceed?')) return;
+
+    const snapshot = await getDocs(collection(db, "responses"));
+    snapshot.forEach(async docSnap => {
+        await deleteDoc(doc(db, "responses", docSnap.id));
+    });
+
+    renderStats([]);
+    renderTable([]);
+}
+        
 
         surveyForm.reset();
         thankYou.style.display = 'block';

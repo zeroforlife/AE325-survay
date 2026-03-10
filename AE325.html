@@ -399,12 +399,20 @@ getDocs(collection(window.db,"responses")).then(snapshot=>{
 });
     }
 
-    function clearAllResponses() {
-        if (!confirm('This will permanently delete all stored responses. Proceed?')) return;
-        localStorage.removeItem(STORAGE_KEY);
-        renderStats([]);
-        renderTable([]);
-    }
+async function clearAllResponses() {
+    if (!confirm('This will permanently delete all stored responses. Proceed?')) return;
+
+    const snapshot = await getDocs(collection(window.db, "responses"));
+
+    const deletePromises = snapshot.docs.map(docSnap =>
+        deleteDoc(doc(window.db, "responses", docSnap.id))
+    );
+
+    await Promise.all(deletePromises);
+
+    renderStats([]);
+    renderTable([]);
+}
 
     startButton.addEventListener('click', () => {
         const name = normalizeName(document.getElementById('nameInput').value);

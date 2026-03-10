@@ -149,10 +149,11 @@
 </head>
 <body>
 
-<video id="bgVideo" autoplay muted loop playsinline>
-    <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-    <!-- Using a public MP4 so GitHub Pages can load it without needing a local video file. -->
+<video id="bgVideo" autoplay muted loop playsinline poster="https://www.w3schools.com/html/pic_trulli.jpg" onerror="bgVideoFallback()">
+    <source src="https://www.w3schools.com/html/movie.mp4" type="video/mp4">
+    <!-- Using a reliable public MP4 so GitHub Pages can load it without needing a local video file. -->
 </video>
+<img id="bgFallback" src="https://www.w3schools.com/html/pic_trulli.jpg" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-2;" alt="background"/>
 
 <div class="content-overlay">
         <button id="ownerButton">Owner Login</button>
@@ -271,6 +272,33 @@
     const startButton = document.getElementById('startButton');
     const stepSurvey = document.getElementById('stepSurvey');
     const stepName = document.getElementById('stepName');
+
+    const bgVideo = document.getElementById('bgVideo');
+    const bgFallback = document.getElementById('bgFallback');
+
+    function bgVideoFallback() {
+        if (bgVideo) {
+            bgVideo.style.display = 'none';
+        }
+        if (bgFallback) {
+            bgFallback.style.display = 'block';
+        }
+    }
+
+    // Attempt to auto-play after the first user interaction (some browsers block autoplay).
+    document.addEventListener('click', () => {
+        if (bgVideo && bgVideo.paused) {
+            bgVideo.play().catch(() => {
+                // ignore playback errors
+            });
+        }
+    }, { once: true });
+
+    if (bgVideo) {
+        bgVideo.addEventListener('error', () => {
+            bgVideoFallback();
+        });
+    }
 
     function getResponses() {
         try {

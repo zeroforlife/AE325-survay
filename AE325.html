@@ -36,7 +36,7 @@
         }
 
         .form-container {
-            background: rgba(255,255,255,0.45);
+            background: rgba(30, 29, 29, 0.45);
             backdrop-filter: blur(16px);
             padding: 30px;
             border-radius: 12px;
@@ -49,7 +49,7 @@
         /* Owner login should remain fully readable */
         #ownerLogin,
         #ownerArea {
-            background: rgba(255,255,255,0.92) !important;
+            background: rgba(251, 251, 251, 0.92) !important;
             backdrop-filter: none !important;
         }
 
@@ -102,15 +102,15 @@
             font-weight: bold;
             display: block;
             margin-bottom: 15px;
-            color: #2c3e50;
+            color: #1e3246;
         }
         .option {
             display: block;
-            background: #f9f9f9;
+            background: #666161;
             padding: 12px;
             margin-bottom: 10px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #562f2f;
             cursor: pointer;
             transition: 0.2s;
         }
@@ -124,7 +124,7 @@
         textarea {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #cd6464;
             border-radius: 5px;
             box-sizing: border-box;
             resize: vertical;
@@ -242,10 +242,31 @@
     </div>
 </div>
 </div>
+<script type="module">
 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "PASTE_FROM_FIREBASE",
+  authDomain: "PASTE_FROM_FIREBASE",
+  projectId: "PASTE_FROM_FIREBASE",
+  storageBucket: "PASTE_FROM_FIREBASE",
+  messagingSenderId: "PASTE_FROM_FIREBASE",
+  appId: "PASTE_FROM_FIREBASE"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+window.db = db;
+window.collection = collection;
+window.addDoc = addDoc;
+window.getDocs = getDocs;
+
+</script>
 <script>
 (function() {
-    const STORAGE_KEY = 'ae325_survey_responses_v1';
     const OWNER_PASSWORD = 'examOwner2026';
 
     const surveyForm = document.getElementById('surveyForm');
@@ -300,19 +321,9 @@
         });
     }
 
-    function getResponses() {
-        try {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            return raw ? JSON.parse(raw) : [];
-        } catch (e) {
-            console.warn('Failed to parse stored responses', e);
-            return [];
-        }
-    }
 
-    function saveResponses(responses) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(responses));
-    }
+
+
 
     function formatDate(ts) {
         const d = new Date(ts);
@@ -374,9 +385,15 @@
         ownerError.style.display = 'none';
         ownerArea.style.display = 'block';
         surveyContainer.style.display = 'none';
-        const responses = getResponses();
-        renderStats(responses);
-        renderTable(responses);
+getDocs(collection(window.db,"responses")).then(snapshot=>{
+    const responses=[];
+    snapshot.forEach(doc=>{
+        responses.push(doc.data());
+    });
+
+    renderStats(responses);
+    renderTable(responses);
+});
     }
 
     function clearAllResponses() {
@@ -412,13 +429,17 @@
             return;
         }
 
-        const responses = getResponses();
-        responses.push({
-            name,
-            agreement,
-            comments,
-            createdAt: Date.now()
-        });
+        if (!agreement) {
+            alert('Please select an option before submitting.');
+            return;
+        }
+
+addDoc(collection(window.db,"responses"),{
+    name:name,
+    agreement:agreement,
+    comments:comments,
+    createdAt:new Date().toISOString()
+});
         saveResponses(responses);
 
         surveyForm.reset();
